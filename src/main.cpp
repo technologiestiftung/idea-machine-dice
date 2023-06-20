@@ -26,7 +26,7 @@ void sendValueToServer(const String &value)
   Serial.println("\nConnecting to " + String(server));
   client.setInsecure(); // skip verification
 
-  if (!client.connect(server, 443))
+  if (!client.connect(server, port))
     Serial.println("Connection failed.");
   else
   {
