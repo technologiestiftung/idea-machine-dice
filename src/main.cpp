@@ -3,6 +3,7 @@
 #include <Adafruit_MPU6050.h>
 #include <Adafruit_Sensor.h>
 #include <Wire.h>
+#include <WiFiClient.h>
 #include <WiFiClientSecure.h>
 
 Adafruit_MPU6050 mpu;
@@ -18,13 +19,12 @@ bool lastButtonState = false;
 
 #define LED_PIN 25
 
-WiFiClientSecure client;
+WiFiClient client;
 
 void sendValueToServer(const String &value)
 {
 
   Serial.println("\nConnecting to " + String(server));
-  client.setInsecure(); // skip verification
 
   if (!client.connect(server, port))
     Serial.println("Connection failed.");
