@@ -223,5 +223,5 @@ void loop()
 {
   change_id();
   measure();
-  delay(1000);
+  delay(500);
 }
