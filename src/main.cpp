@@ -3,12 +3,10 @@
 #include <Adafruit_MPU6050.h>
 #include <Adafruit_Sensor.h>
 #include <Wire.h>
-#include <WiFiClient.h>
 #include <WiFiClientSecure.h>
 
 Adafruit_MPU6050 mpu;
 
-char myID[] = "A";
 const int debug = 0;
 int last_side = 0;
 int movement_counter = 0;
@@ -19,12 +17,13 @@ bool lastButtonState = false;
 
 #define LED_PIN 25
 
-WiFiClient client;
+WiFiClientSecure client;
 
 void sendValueToServer(const String &value)
 {
 
   Serial.println("\nConnecting to " + String(server));
+  client.setInsecure(); // skip verification
 
   if (!client.connect(server, port))
     Serial.println("Connection failed.");
@@ -81,6 +80,7 @@ void startWifi()
 {
   // Verbindung zum Wi-Fi-Netzwerk herstellen
   WiFi.begin(ssid, password);
+  // WiFi.begin(ssid);
 
   Serial.print("Connecting to ");
   Serial.print(ssid);
@@ -170,32 +170,6 @@ void measure()
   }
 }
 
-void change_id()
-{
-  buttonState = digitalRead(BUTTON_PIN);
-  if (buttonState == LOW && lastButtonState == HIGH)
-  {
-    if (strcmp(myID, "A") == 0)
-    {
-      strcpy(myID, "B");
-      blinkLED(2);
-    }
-    else if (strcmp(myID, "B") == 0)
-    {
-      strcpy(myID, "C");
-      blinkLED(3);
-    }
-    else if (strcmp(myID, "B") == 0)
-    {
-      strcpy(myID, "A");
-      blinkLED(1);
-    }
-    Serial.print("ID: ");
-    Serial.println(myID);
-  }
-  lastButtonState = buttonState;
-}
-
 void setup(void)
 {
   Serial.begin(115200);
@@ -217,11 +191,12 @@ void setup(void)
   mpu.setFilterBandwidth(MPU6050_BAND_21_HZ);
 
   startWifi();
+  Serial.print("ID: ");
+  Serial.println(myID);
 }
 
 void loop()
 {
-  change_id();
   measure();
   delay(500);
 }
