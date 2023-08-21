@@ -35,6 +35,7 @@ void sendValueToServer(const String &value)
     client.println("Host: " + String(server));
     client.println("Connection: close");
     client.println("Content-Type: application/x-www-form-urlencoded");
+    client.println("Accept: application/json");
     client.println("Authorization: Bearer " + String(token));
     client.print("Content-Length: ");
     client.println(String(strlen("shortcode=XX")));
