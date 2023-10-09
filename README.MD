@@ -9,11 +9,22 @@ It is supposed to run on a Heltec ESP32 Lora board. When successfully connected,
 Rename the `condig-example.h` file to `config.h` and adjust the values to your setup:
 
 ````
-const char* ssid = "YOUR SSID";
-const char* password = "YOUR WIFI PASSWORD";
-const char* server = "YOUR URL"; // Server URL
-const int port = 3000;           // insert your port
-const char* token = "YOUR BEARER TOKEN";
-const char* endpoint = "PATH/TO/ENDPOINT";
-const char myID[] = "A"; // One of A, B, C
+
 ````
+
+### Bluetooth Setup:
+
+1. You need to pair the board with the raspberry pi.
+2. Check if `bluetoothctl` is installed on the pi. If not, install it.
+3. Install `picocom` on the pi:
+```shell
+sudo apt-get install picocom
+```
+4. bind the esp32 to a serial port on the raspberry pi (needs to be done every time the pi is restarted):
+```shell
+sudo rfcomm bind rfcomm0 <MAC_ADDRESS_OF_ESP32_BOARD>
+```
+5. You can then run the following command on the raspberry pi to receive the data from the board:
+```shell
+picocom /dev/rfcomm0 -b 115200
+```
