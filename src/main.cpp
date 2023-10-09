@@ -3,7 +3,7 @@
 #include <Adafruit_MPU6050.h>
 #include <Adafruit_Sensor.h>
 #include <Wire.h>
-#include <WiFiClientSecure.h>
+#include "BluetoothSerial.h"
 
 Adafruit_MPU6050 mpu;
 
@@ -11,106 +11,17 @@ const int debug = 0;
 int last_side = 0;
 int movement_counter = 0;
 
-const int BUTTON_PIN = 0;
-bool buttonState = false;
-bool lastButtonState = false;
-
-#define LED_PIN 25
-
-WiFiClientSecure client;
-
-void sendValueToServer(const String &value)
-{
-
-  Serial.println("\nConnecting to " + String(server));
-  client.setInsecure(); // skip verification
-
-  if (!client.connect(server, port))
-    Serial.println("Connection failed.");
-  else
-  {
-    Serial.println("Connected.");
-
-    client.println("POST " + String(endpoint) + " HTTP/1.1");
-    client.println("Host: " + String(server));
-    client.println("Connection: close");
-    client.println("Content-Type: application/x-www-form-urlencoded");
-    client.println("Accept: application/json");
-    client.println("Authorization: Bearer " + String(token));
-    client.print("Content-Length: ");
-    client.println(String(strlen("shortcode=XX")));
-    client.println();
-    client.print("shortcode=");
-    client.println(value);
-
-    while (client.connected())
-    {
-      String line = client.readStringUntil('\n');
-      if (line == "\r")
-      {
-        Serial.println("headers received");
-        break;
-      }
-    }
-    // if there are incoming bytes available
-    // from the server, read them and print them:
-    while (client.available())
-    {
-      char c = client.read();
-      Serial.write(c);
-    }
-
-    client.stop();
-  }
-}
-
-void blinkLED(int numBlinks)
-{
-  pinMode(LED_PIN, OUTPUT);
-
-  for (int i = 0; i < numBlinks; i++)
-  {
-    digitalWrite(LED_PIN, HIGH); // LED einschalten
-    delay(500);                  // 500 Millisekunden warten
-    digitalWrite(LED_PIN, LOW);  // LED ausschalten
-    delay(500);                  // 500 Millisekunden warten
-  }
-}
-
-void startWifi()
-{
-  // Verbindung zum Wi-Fi-Netzwerk herstellen
-  WiFi.begin(ssid, password);
-  // WiFi.begin(ssid);
-
-  Serial.print("Connecting to ");
-  Serial.print(ssid);
-
-  while (WiFi.status() != WL_CONNECTED)
-  {
-    delay(500);
-    Serial.print(".");
-  }
-  Serial.println("Connected.");
-}
-
-void stopWifi()
-{
-  // Wi-Fi-Verbindung trennen
-  WiFi.disconnect(true);
-  WiFi.mode(WIFI_OFF);
-  Serial.println("Wi-Fi-Verbindung getrennt.");
-}
+BluetoothSerial SerialBT;
 
 void measure()
 {
-  /* Get new sensor events with the readings */
+  // Get new sensor events with the readings 
   sensors_event_t a, g, temp;
   mpu.getEvent(&a, &g, &temp);
 
   if (debug == 1)
   {
-    /* Print out the values */
+    // Print out the values 
     Serial.print("X: ");
     Serial.print(a.acceleration.x);
     Serial.print(", Y: ");
@@ -120,16 +31,15 @@ void measure()
     Serial.println("");
   }
 
-  /*
-   *  Sides (like on a real 1-6 die)
-   *  1 = z+
-   *  2 = x-
-   *  3 = y-
-   *  4 = y+
-   *  5 = x+
-   *  6 = z-
-   *
-   */
+  
+  //   Sides (like on a real 1-6 die)
+  //   1 = z+
+  //   2 = x-
+  //   3 = y-
+  //   4 = y+
+  //   5 = x+
+  //   6 = z-
+  
 
   int side = 0;
   if (a.acceleration.x >= +8)
@@ -167,7 +77,7 @@ void measure()
     Serial.print(roll);
     Serial.println("");
 
-    sendValueToServer(roll);
+    SerialBT.println(roll);
   }
 }
 
@@ -186,12 +96,12 @@ void setup(void)
     Serial.println("MPU6050 Found!");
   }
 
-  pinMode(BUTTON_PIN, INPUT_PULLUP);
-
   mpu.setAccelerometerRange(MPU6050_RANGE_8_G);
   mpu.setFilterBandwidth(MPU6050_BAND_21_HZ);
 
-  startWifi();
+  SerialBT.begin("ESP32test"); //Name des ESP32
+  Serial.println("The ESP32 is ready. You can now connect via Bluetooth.");
+
   Serial.print("ID: ");
   Serial.println(myID);
 }
