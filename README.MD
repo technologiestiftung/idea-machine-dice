@@ -4,12 +4,14 @@ This C project can be used with platform.io & VSCode. Alternatively, you can ins
 
 ### What it does
 
-It is supposed to run on a Heltec ESP32 Lora board. When successfully connected, the board will measure acceleration via the MPU6050 board and send a value to the defined server. The value would be the device's/cube's ID (A, B or C) and the side of the cube facing up (1,2,3,4,5 or 6), e.g. `E3`, `A2`.
+We used Heltec ESP32 Lora boards and ESP32 NodeMCU Development boards. 
+When successfully connected, the board will measure acceleration via the MPU6050 board and send a value to the server. 
+The value would be the side of the cube facing up (1,2,3,4,5 or 6), e.g. `3`, `2`.
 
 Rename the `condig-example.h` file to `config.h` and adjust the values to your setup:
 
 ````
-
+const char name[] = "esp32";
 ````
 
 ### Bluetooth Setup:
