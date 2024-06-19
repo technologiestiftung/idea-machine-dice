@@ -71,13 +71,11 @@ void measure()
   if (movement_counter == 2)
   {
     movement_counter++;
-    char roll[10];
-    sprintf(roll, "%c%d", myID[0], side);
     Serial.println("....sending data...");
-    Serial.print(roll);
+    Serial.print(side);
     Serial.println("");
 
-    SerialBT.println(roll);
+    SerialBT.println(side);
   }
 }
 
@@ -99,11 +97,8 @@ void setup(void)
   mpu.setAccelerometerRange(MPU6050_RANGE_8_G);
   mpu.setFilterBandwidth(MPU6050_BAND_21_HZ);
 
-  SerialBT.begin("ESP32test"); //Name des ESP32
+  SerialBT.begin(name); // Name of the ESP32
   Serial.println("The ESP32 is ready. You can now connect via Bluetooth.");
-
-  Serial.print("ID: ");
-  Serial.println(myID);
 }
 
 void loop()
